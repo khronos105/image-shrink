@@ -156,4 +156,6 @@ const shrinkImage = async ({ imgPath, quality, dest }) => {
   }
 
   shell.openPath(dest);
+
+  mainWindow.webContents.send("image:done");
 };

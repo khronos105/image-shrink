@@ -27,4 +27,9 @@ window.addEventListener("DOMContentLoaded", () => {
       quality,
     });
   });
+
+  // On done
+  ipcRenderer.on("image:done", () => {
+    alert(`Ìmage resized to ${slider.value} quality`);
+  });
 });
