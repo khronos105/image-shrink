@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require("electron");
+const { app, BrowserWindow, Menu, globalShortcut } = require("electron");
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isLinux = process.platform === "linux" ? true : false;
@@ -13,6 +13,7 @@ const createMainWindow = () => {
     height: 600,
     icon: `${__dirname}/assets/icons/Icon_256x256.png`,
     resizable: isDev ? true : false,
+    backgroundColor: "white",
   });
 
   //mainWindow.loadURL('https://twitter.com')
@@ -27,6 +28,14 @@ app.whenReady().then(() => {
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
+
+  globalShortcut.register("CmdOrCtrl+R", () => {
+    mainWindow.reload();
+  });
+
+  globalShortcut.register(isMac ? "Command+Alt+I" : "Ctrl+Shift+I", () => {
+    mainWindow.toggleDevTools();
+  });
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -53,6 +62,8 @@ const menu = [
     submenu: [
       {
         label: "Quit",
+        //accelerator: isMac ? "Command+W" : "Ctrl+W",
+        accelerator: "CmdOrCtrl+W",
         click: () => app.quit(),
       },
     ],
