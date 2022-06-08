@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain } = require("electron");
+const path = require("path");
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isLinux = process.platform === "linux" ? true : false;
@@ -10,12 +11,19 @@ let aboutWindow;
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     title: "ImageShrink",
-    width: 500,
+    width: isDev ? 1000 : 500,
     height: 600,
     icon: `${__dirname}/assets/icons/Icon_256x256.png`,
     resizable: isDev ? true : false,
     backgroundColor: "white",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
+
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
 
   //mainWindow.loadURL('https://twitter.com')
 
@@ -36,6 +44,9 @@ const createAboutWindow = () => {
     icon: `${__dirname}/assets/icons/Icon_256x256.png`,
     resizable: false,
     backgroundColor: "white",
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   aboutWindow.loadFile(`${__dirname}/app/about.html`);
@@ -117,3 +128,10 @@ const menu = [
       ]
     : []),
 ];
+
+/**
+ * IPC MAIN
+ */
+ipcMain.on("image:minimize", (e, options) => {
+  console.log(options);
+});
