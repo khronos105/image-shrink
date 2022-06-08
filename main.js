@@ -1,10 +1,11 @@
-const { app, BrowserWindow, Menu, globalShortcut } = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isLinux = process.platform === "linux" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
 
 let mainWindow;
+let aboutWindow;
 
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
@@ -23,19 +24,36 @@ const createMainWindow = () => {
   mainWindow.loadFile(`${__dirname}/app/index.html`);
 };
 
+/**
+ * AboutWindow
+ */
+
+const createAboutWindow = () => {
+  aboutWindow = new BrowserWindow({
+    title: "About ImageShrink",
+    width: 300,
+    height: 300,
+    icon: `${__dirname}/assets/icons/Icon_256x256.png`,
+    resizable: false,
+    backgroundColor: "white",
+  });
+
+  aboutWindow.loadFile(`${__dirname}/app/about.html`);
+};
+
 app.whenReady().then(() => {
   createMainWindow();
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
 
-  globalShortcut.register("CmdOrCtrl+R", () => {
+  /*globalShortcut.register("CmdOrCtrl+R", () => {
     mainWindow.reload();
   });
 
   globalShortcut.register(isMac ? "Command+Alt+I" : "Ctrl+Shift+I", () => {
     mainWindow.toggleDevTools();
-  });
+  });*/
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -56,16 +74,46 @@ app.on("window-all-closed", () => {
 });
 
 const menu = [
-  ...(isMac ? [{ role: "appMenu" }] : []),
+  ...(isMac
+    ? [
+        {
+          label: app.name,
+          submenu: [
+            {
+              label: "About",
+              click: createAboutWindow,
+            },
+          ],
+        },
+      ]
+    : []),
   {
-    label: "File",
-    submenu: [
-      {
-        label: "Quit",
-        //accelerator: isMac ? "Command+W" : "Ctrl+W",
-        accelerator: "CmdOrCtrl+W",
-        click: () => app.quit(),
-      },
-    ],
+    role: "fileMenu",
   },
+  ...(!isMac
+    ? [
+        {
+          label: "Help",
+          submenu: [
+            {
+              label: "About",
+              click: createAboutWindow,
+            },
+          ],
+        },
+      ]
+    : []),
+  ...(isDev
+    ? [
+        {
+          label: "Developer",
+          submenu: [
+            { role: "reload" },
+            { role: "forcereload" },
+            { type: "separator" },
+            { role: "toggledevtools" },
+          ],
+        },
+      ]
+    : []),
 ];
