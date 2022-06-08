@@ -1,5 +1,7 @@
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 const path = require("path");
+const os = require("os");
+const { app, BrowserWindow, Menu, ipcMain, shell } = require("electron");
+const { compress } = require("compress-images/promise");
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isLinux = process.platform === "linux" ? true : false;
@@ -133,5 +135,25 @@ const menu = [
  * IPC MAIN
  */
 ipcMain.on("image:minimize", (e, options) => {
-  console.log(options);
+  options.dest = path.join(os.homedir(), "imageshrink/");
+  shrinkImage(options);
 });
+
+const shrinkImage = async ({ imgPath, quality, dest }) => {
+  try {
+    const pngQuality = quality / 100;
+    imgPath = imgPath.replace(/\\/g, "/");
+    const result = await compress({
+      source: imgPath,
+      destination: dest,
+      enginesSetup: {
+        jpg: { engine: "mozjpeg", command: ["-quality", quality] },
+        png: { engine: "pngquant", command: ["--quality=" + quality, "-o"] },
+      },
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
+  shell.openPath(dest);
+};
