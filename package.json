@@ -1,20 +1,26 @@
 {
   "name": "image-shrink",
+  "productName": "ImageShrink",
   "version": "1.0.0",
   "description": "App for shrink images",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "nodemon --exec electron ."
+    "dev": "nodemon --exec electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=false --out=release-builds",
+    "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=false --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"ImageShrink\"",
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/Icon_1024x1024.png --prune=false --out=release-builds"
   },
   "author": "Roma Bilibov",
   "license": "MIT",
   "devDependencies": {
     "compress-images": "^2.0.5",
     "electron": "^19.0.4",
+    "electron-packager": "^15.5.1",
     "nodemon": "^2.0.16"
   },
   "dependencies": {
+    "dotenv": "^16.0.1",
     "pngquant-bin": "^6.0.1"
   }
 }

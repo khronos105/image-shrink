@@ -1,9 +1,10 @@
 const path = require("path");
 const os = require("os");
+require("dotenv").config();
 const { app, BrowserWindow, Menu, ipcMain, shell } = require("electron");
 const { compress } = require("compress-images/promise");
 
-const isDev = process.env.NODE_ENV !== "production" ? true : false;
+const isDev = process.env.NODE_ENV === "development" ? true : false;
 const isLinux = process.platform === "linux" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
 
